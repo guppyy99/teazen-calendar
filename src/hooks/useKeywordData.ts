@@ -33,12 +33,20 @@ export function useKeywordData(year: number, month?: number) {
   const loadData = async () => {
     try {
       setIsLoading(true)
-      const data = await fetchKeywordDataFromSheet()
-      setAllData(data)
       setError(null)
-    } catch (err) {
-      setError('데이터를 불러오는데 실패했습니다.')
-      console.error(err)
+      const data = await fetchKeywordDataFromSheet()
+      
+      if (!data || data.length === 0) {
+        throw new Error('불러온 데이터가 비어있습니다.')
+      }
+      
+      console.log(`✅ ${data.length}개 데이터 로드 성공`)
+      setAllData(data)
+    } catch (err: any) {
+      const errorMsg = err.message || '데이터를 불러오는데 실패했습니다.'
+      setError(errorMsg)
+      console.error('❌ 데이터 로드 에러:', err)
+      setAllData([])
     } finally {
       setIsLoading(false)
     }

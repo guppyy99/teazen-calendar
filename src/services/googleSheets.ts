@@ -22,8 +22,7 @@ export async function fetchKeywordDataFromSheet(): Promise<KeywordData[]> {
     const rows = response.data.values || []
 
     if (rows.length < 2) {
-      console.warn('시트에 데이터가 없습니다.')
-      return generateSampleData()
+      throw new Error('시트에 데이터가 없습니다. 시트를 확인하세요.')
     }
 
     // 첫 번째 행은 헤더
@@ -33,8 +32,8 @@ export async function fetchKeywordDataFromSheet(): Promise<KeywordData[]> {
     const monthColumnStartIndex = headers.findIndex((h: string) => /^\d{4}-\d{1,2}$/.test(h))
     
     if (monthColumnStartIndex === -1) {
-      console.error('월별 데이터 컬럼을 찾을 수 없습니다.')
-      return generateSampleData()
+      console.error('헤더:', headers)
+      throw new Error('월별 데이터 컬럼을 찾을 수 없습니다. 헤더 형식을 확인하세요 (예: 2021-11)')
     }
 
     const result: KeywordData[] = []
@@ -94,51 +93,16 @@ export async function fetchKeywordDataFromSheet(): Promise<KeywordData[]> {
     console.log(`✅ 구글 시트에서 ${result.length}개 데이터 로드 완료`)
     return result
 
-  } catch (error) {
-    console.error('구글 시트 데이터 로드 실패:', error)
-    console.log('⚠️ 샘플 데이터를 사용합니다.')
-    return generateSampleData()
+  } catch (error: any) {
+    console.error('❌ 구글 시트 데이터 로드 실패:', error)
+    console.error('API 키:', GOOGLE_SHEETS_API_KEY ? '설정됨' : '❌ 없음')
+    console.error('시트 ID:', SPREADSHEET_ID)
+    console.error('에러 상세:', error.response?.data || error.message)
+    throw new Error(`구글 시트 연결 실패: ${error.message}`)
   }
 }
 
-/**
- * 샘플 데이터 생성 (개발/테스트용)
- */
-function generateSampleData(): KeywordData[] {
-  const keywords = ['삼겹살', '치킨', '쿠팡이츠', '염덕', '회식장소', 'BHC', '떡볶이', '피자', '햄버거', '초밥']
-  const data: KeywordData[] = []
-  const currentYear = new Date().getFullYear()
-
-  for (const keyword of keywords) {
-    // 2021-11부터 현재까지
-    for (let year = 2021; year <= currentYear; year++) {
-      const startMonth = year === 2021 ? 11 : 1
-      const endMonth = year === currentYear ? new Date().getMonth() + 1 : 12
-
-      for (let month = startMonth; month <= endMonth; month++) {
-        data.push({
-          keyword,
-          year,
-          month,
-          searchVolume: Math.floor(Math.random() * 10000) + 1000,
-          maleRatio: 40 + Math.random() * 20,
-          femaleRatio: 40 + Math.random() * 20,
-          ageDistribution: {
-            '12세 이하': Math.floor(Math.random() * 15) + 3,
-            '13~19세': Math.floor(Math.random() * 20) + 8,
-            '20~24세': Math.floor(Math.random() * 18) + 10,
-            '25~29세': Math.floor(Math.random() * 20) + 12,
-            '30~39세': Math.floor(Math.random() * 25) + 15,
-            '40~49세': Math.floor(Math.random() * 20) + 10,
-            '50세 이상': Math.floor(Math.random() * 15) + 8,
-          }
-        })
-      }
-    }
-  }
-
-  return data
-}
+// 더미 데이터 삭제됨 - 실제 구글 시트 데이터만 사용
 
 /**
  * 특정 년도/월의 데이터 필터링
