@@ -13,13 +13,26 @@ const SPREADSHEET_ID = '11suzDWw5CjAnLxiwVHbdn-xUkttdtUMmoxDMZvxqkiA'
  * 데이터(2행~): 삼겹살 | 52.5 | 47.5 | ... | 8 | 15 | ... | 1234 | 5678 | ...
  */
 export async function fetchKeywordDataFromSheet(): Promise<KeywordData[]> {
+  // 디버깅 정보 출력
+  console.log('=== 구글 시트 연결 시도 ===')
+  console.log('API 키:', GOOGLE_SHEETS_API_KEY ? `${GOOGLE_SHEETS_API_KEY.substring(0, 10)}...` : '❌ 없음')
+  console.log('시트 ID:', SPREADSHEET_ID)
+  
+  if (!GOOGLE_SHEETS_API_KEY) {
+    throw new Error('❌ VITE_GOOGLE_SHEETS_API_KEY 환경변수가 설정되지 않았습니다!\n\n.env 파일을 확인하세요.')
+  }
+  
   try {
     // 헤더와 데이터 모두 가져오기
     const range = 'Sheet1!A1:BZ1000' // A부터 BZ까지 (충분히 넓게)
     const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${range}?key=${GOOGLE_SHEETS_API_KEY}`
+    
+    console.log('요청 URL:', url.replace(GOOGLE_SHEETS_API_KEY, 'API_KEY_HIDDEN'))
 
     const response = await axios.get(url)
     const rows = response.data.values || []
+    
+    console.log('응답 받음:', rows.length, '행')
 
     if (rows.length < 2) {
       throw new Error('시트에 데이터가 없습니다. 시트를 확인하세요.')
