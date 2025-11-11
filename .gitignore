@@ -29,6 +29,9 @@ dist-ssr
 .env.production
 .env.development
 
+# Data files (업데이트 시마다 새로 다운로드)
+data.csv
+
 # Vercel
 .vercel
 

@@ -6,20 +6,48 @@ const GOOGLE_SHEETS_API_KEY = import.meta.env.VITE_GOOGLE_SHEETS_API_KEY
 const SPREADSHEET_ID = '11suzDWw5CjAnLxiwVHbdn-xUkttdtUMmoxDMZvxqkiA'
 
 /**
- * 구글 시트에서 데이터 가져오기
+ * JSON 파일에서 데이터 가져오기 (더 간단하고 안정적!)
+ */
+export async function fetchKeywordDataFromJSON(): Promise<KeywordData[]> {
+  try {
+    console.log('📦 로컬 JSON 파일에서 데이터 로드 중...')
+    const response = await fetch('/data.json')
+    
+    if (!response.ok) {
+      throw new Error(`JSON 파일 로드 실패: ${response.status}`)
+    }
+    
+    const data = await response.json()
+    console.log(`✅ ${data.length}개 데이터 로드 완료`)
+    return data as KeywordData[]
+  } catch (error: any) {
+    console.error('❌ JSON 데이터 로드 실패:', error)
+    throw new Error('데이터 파일을 찾을 수 없습니다. data.json을 확인하세요.')
+  }
+}
+
+/**
+ * 구글 시트에서 데이터 가져오기 (API 키 방식)
  * 
  * 실제 시트 구조:
  * 헤더(1행): 키워드 | 남성(%) | 여성(%) | 연령대별 특성 | 12세 이하(%) | 13~19세(%) | ... | 2021-11 | 2021-12 | ...
  * 데이터(2행~): 삼겹살 | 52.5 | 47.5 | ... | 8 | 15 | ... | 1234 | 5678 | ...
  */
 export async function fetchKeywordDataFromSheet(): Promise<KeywordData[]> {
-  // 디버깅 정보 출력
-  console.log('=== 구글 시트 연결 시도 ===')
+  // JSON 파일 먼저 시도
+  try {
+    return await fetchKeywordDataFromJSON()
+  } catch (jsonError) {
+    console.log('⚠️ JSON 파일 없음, 구글 시트 API 시도...')
+  }
+  
+  // 구글 시트 API 방식
+  console.log('=== 구글 시트 API 연결 시도 ===')
   console.log('API 키:', GOOGLE_SHEETS_API_KEY ? `${GOOGLE_SHEETS_API_KEY.substring(0, 10)}...` : '❌ 없음')
   console.log('시트 ID:', SPREADSHEET_ID)
   
   if (!GOOGLE_SHEETS_API_KEY) {
-    throw new Error('❌ VITE_GOOGLE_SHEETS_API_KEY 환경변수가 설정되지 않았습니다!\n\n.env 파일을 확인하세요.')
+    throw new Error('❌ VITE_GOOGLE_SHEETS_API_KEY 환경변수가 설정되지 않았습니다!\n\n또는 public/data.json 파일을 생성하세요.')
   }
   
   try {
@@ -29,7 +57,6 @@ export async function fetchKeywordDataFromSheet(): Promise<KeywordData[]> {
     const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${range}?key=${GOOGLE_SHEETS_API_KEY}`
     
     console.log(`📊 시트 접근: ${sheetName}`)
-    console.log('요청 URL:', url.replace(GOOGLE_SHEETS_API_KEY, 'API_KEY_HIDDEN'))
 
     const response = await axios.get(url)
     const rows = response.data.values || []
@@ -43,8 +70,6 @@ export async function fetchKeywordDataFromSheet(): Promise<KeywordData[]> {
     const headers = rows[0]
     console.log('헤더 개수:', headers.length)
     console.log('처음 15개 헤더:', headers.slice(0, 15))
-
-    // headers는 위에서 이미 설정됨
     
     // 월별 데이터 컬럼 찾기 (2021-11, 2022-9 형식)
     const monthColumnStartIndex = headers.findIndex((h: string) => {
@@ -56,8 +81,7 @@ export async function fetchKeywordDataFromSheet(): Promise<KeywordData[]> {
     if (monthColumnStartIndex === -1) {
       console.error('❌ 월별 컬럼을 찾을 수 없습니다!')
       console.error('전체 헤더:', headers)
-      console.error('YYYY-M 또는 YYYY-MM 형식의 헤더가 필요합니다 (예: 2021-11, 2022-1)')
-      throw new Error(`월별 데이터 컬럼을 찾을 수 없습니다.\n\n시트 헤더: ${headers.slice(0, 20).join(', ')}...\n\n2021-11 같은 형식이 필요합니다.`)
+      throw new Error(`월별 데이터 컬럼을 찾을 수 없습니다.\n\n시트 헤더: ${headers.slice(0, 20).join(', ')}`)
     }
     
     console.log(`✅ 월별 데이터 시작 컬럼: ${monthColumnStartIndex} (${headers[monthColumnStartIndex]})`)
@@ -68,12 +92,11 @@ export async function fetchKeywordDataFromSheet(): Promise<KeywordData[]> {
     for (let i = 1; i < rows.length; i++) {
       const row = rows[i]
       
-      if (!row || !row[0]) continue // 키워드가 없으면 스킵
+      if (!row || !row[0]) continue
 
       const keyword = row[0]
       const maleRatio = parseFloat(row[1]) || 50
       const femaleRatio = parseFloat(row[2]) || 50
-      // row[3]은 "연령대별 특성" (사용 안 함)
       const age12Under = parseFloat(row[4]) || 0
       const age13to19 = parseFloat(row[5]) || 0
       const age20to24 = parseFloat(row[6]) || 0
@@ -85,7 +108,7 @@ export async function fetchKeywordDataFromSheet(): Promise<KeywordData[]> {
       // 월별 데이터 처리
       for (let j = monthColumnStartIndex; j < headers.length; j++) {
         const yearMonth = headers[j] as string
-        const match = yearMonth.match(/^(\d{4})-(\d{1,2})$/)
+        const match = yearMonth?.toString().trim().match(/^(\d{4})-(\d{1,2})$/)
         
         if (!match) continue
 
@@ -93,7 +116,6 @@ export async function fetchKeywordDataFromSheet(): Promise<KeywordData[]> {
         const month = parseInt(match[2])
         const searchVolume = parseFloat(row[j]) || 0
 
-        // searchVolume이 0이 아닌 경우만 추가
         if (searchVolume > 0) {
           result.push({
             keyword,
