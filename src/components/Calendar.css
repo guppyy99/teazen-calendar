@@ -56,19 +56,24 @@
 .year-month-selector {
   display: flex;
   align-items: center;
-  gap: 14px;
-  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.year-selector-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .year-nav {
   background: none;
   border: none;
-  font-size: 22px;
+  font-size: 20px;
   color: #bbb;
   cursor: pointer;
-  padding: 6px 14px;
+  padding: 4px 10px;
   transition: color 0.2s;
-  font-weight: 300;
+  font-weight: 400;
 }
 
 .year-nav:hover {
@@ -76,37 +81,53 @@
 }
 
 .year-display {
-  font-size: 28px;
+  font-size: 24px;
   font-weight: 700;
   color: #2d2d2d;
-  min-width: 70px;
+  min-width: 60px;
   text-align: center;
-  letter-spacing: -1px;
-  margin-right: 8px;
+  letter-spacing: -0.5px;
+}
+
+.month-selector-group {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
 .month-btn {
-  padding: 12px 26px;
+  padding: 8px 18px;
   border: none;
-  border-radius: 50px;
-  font-size: 15px;
+  border-radius: 20px;
+  font-size: 14px;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.3s;
-  background: #f7f7f7;
+  transition: all 0.2s;
+  background: transparent;
   color: #888;
-  letter-spacing: -0.3px;
+  letter-spacing: -0.2px;
+  opacity: 0.7;
+  box-shadow: none;
 }
 
 .month-btn:hover {
-  background: #ebebeb;
+  opacity: 1;
   color: #555;
 }
 
 .month-btn.active {
   background: #505050;
   color: white;
-  box-shadow: 0 4px 14px rgba(80, 80, 80, 0.35);
+  opacity: 1;
+  box-shadow: 0 3px 10px rgba(80, 80, 80, 0.3);
   font-weight: 600;
+}
+
+@media (max-width: 1200px) {
+  .year-month-selector {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
 }
 

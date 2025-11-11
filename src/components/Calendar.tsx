@@ -55,29 +55,33 @@ function Calendar({ selectedYear, setSelectedYear, selectedMonth, setSelectedMon
       </div>
       
       <div className="year-month-selector">
-        <button 
-          className="year-nav"
-          onClick={() => setSelectedYear(selectedYear - 1)}
-        >
-          &lt;
-        </button>
-        <span className="year-display">{selectedYear}</span>
-        <button 
-          className="year-nav"
-          onClick={() => setSelectedYear(selectedYear + 1)}
-        >
-          &gt;
-        </button>
-        
-        {months.map((month) => (
-          <button
-            key={month.value}
-            className={`month-btn ${selectedMonth === month.value ? 'active' : ''}`}
-            onClick={() => setSelectedMonth(month.value)}
+        <div className="year-selector-group">
+          <button 
+            className="year-nav"
+            onClick={() => setSelectedYear(selectedYear - 1)}
           >
-            {month.label}
+            &lt;
           </button>
-        ))}
+          <span className="year-display">{selectedYear}</span>
+          <button 
+            className="year-nav"
+            onClick={() => setSelectedYear(selectedYear + 1)}
+          >
+            &gt;
+          </button>
+        </div>
+        
+        <div className="month-selector-group">
+          {months.map((month) => (
+            <button
+              key={month.value}
+              className={`month-btn ${selectedMonth === month.value ? 'active' : ''}`}
+              onClick={() => setSelectedMonth(month.value)}
+            >
+              {month.label}
+            </button>
+          ))}
+        </div>
       </div>
     </div>
   )

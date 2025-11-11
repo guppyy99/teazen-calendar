@@ -49,13 +49,12 @@ TEAZEN 브랜드의 혈당 관리 및 마케팅 인사이트 대시보드입니�
 ```bash
 # Google Sheets API (클라이언트 사이드)
 VITE_GOOGLE_SHEETS_API_KEY=your_google_api_key_here
-VITE_GOOGLE_SHEETS_ID=your_spreadsheet_id_here
 
 # OpenAI API (서버 사이드 전용)
 OPENAI_API_KEY=your_openai_api_key_here
 
-# 애플리케이션 설정
-VITE_APP_TITLE=TEAZEN 혈당 캘린더
+# 참고: 구글 시트 ID는 코드에 고정
+# https://docs.google.com/spreadsheets/d/11suzDWw5CjAnLxiwVHbdn-xUkttdtUMmoxDMZvxqkiA/
 ```
 
 ### 2. 패키지 설치 및 실행

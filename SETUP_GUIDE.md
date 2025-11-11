@@ -18,13 +18,15 @@
 ```bash
 # Google Sheets API (클라이언트 사이드)
 VITE_GOOGLE_SHEETS_API_KEY=your_google_api_key_here
-VITE_GOOGLE_SHEETS_ID=your_spreadsheet_id_here
 
 # OpenAI API (서버 사이드 전용 - 절대 클라이언트에 노출하지 마세요!)
 OPENAI_API_KEY=your_openai_api_key_here
 
 # 애플리케이션 설정
 VITE_APP_TITLE=TEAZEN 혈당 캘린더
+
+# 참고: 구글 시트 ID는 코드에 고정되어 있습니다.
+# https://docs.google.com/spreadsheets/d/11suzDWw5CjAnLxiwVHbdn-xUkttdtUMmoxDMZvxqkiA/
 ```
 
 ---
@@ -57,15 +59,14 @@ VITE_APP_TITLE=TEAZEN 혈당 캘린더
 
 ### 4. 구글 시트 준비
 
-#### 스프레드시트 생성 및 설정
+#### 고정된 스프레드시트 사용
 
-1. [Google Sheets](https://sheets.google.com/)에서 새 스프레드시트 생성
-2. 시트 이름을 "Sheet1"로 설정
-3. URL에서 스프레드시트 ID 복사
-   ```
-   https://docs.google.com/spreadsheets/d/{SPREADSHEET_ID}/edit
-   ```
-4. `.env` 파일의 `VITE_GOOGLE_SHEETS_ID`에 ID 붙여넣기
+⚠️ **중요**: 이 프로젝트는 고정된 구글 시트를 사용합니다.
+
+**시트 URL**: https://docs.google.com/spreadsheets/d/11suzDWw5CjAnLxiwVHbdn-xUkttdtUMmoxDMZvxqkiA/
+
+시트 ID는 코드에 하드코딩되어 있으므로 별도로 설정할 필요가 없습니다.
+API 키만 발급받으면 됩니다!
 
 #### 데이터 형식
 

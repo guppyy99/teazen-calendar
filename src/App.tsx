@@ -12,7 +12,7 @@ function App() {
   const [selectedYear, setSelectedYear] = useState(2025)
   const [selectedMonth, setSelectedMonth] = useState(3)
   const [selectedKeywords, setSelectedKeywords] = useState<string[]>([])
-  const [selectedPeriod, setSelectedPeriod] = useState('6달')
+  const [selectedPeriod, setSelectedPeriod] = useState('6개월')
 
   // 실제 데이터 로드
   const { 

@@ -2,7 +2,8 @@ import axios from 'axios'
 import type { KeywordData } from '../types'
 
 const GOOGLE_SHEETS_API_KEY = import.meta.env.VITE_GOOGLE_SHEETS_API_KEY
-const SPREADSHEET_ID = import.meta.env.VITE_GOOGLE_SHEETS_ID
+// 구글 시트 ID 고정
+const SPREADSHEET_ID = '11suzDWw5CjAnLxiwVHbdn-xUkttdtUMmoxDMZvxqkiA'
 
 /**
  * 구글 시트에서 데이터 가져오기

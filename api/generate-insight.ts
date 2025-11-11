@@ -34,28 +34,72 @@ export default async function handler(
       return res.status(400).json({ error: '키워드가 필요합니다.' })
     }
 
-    // 데이터 요약
-    const dataContext = searchData.map((item: any) => 
-      `${item.keyword}: ${item.searchVolume}회 검색 (남성 ${item.maleRatio}%, 여성 ${item.femaleRatio}%)`
-    ).join(', ')
+    // 데이터 요약 및 날짜별 분석
+    const monthlyData = searchData.reduce((acc: any, item: any) => {
+      if (!acc[item.keyword]) {
+        acc[item.keyword] = {
+          totalVolume: 0,
+          maleRatio: item.maleRatio,
+          femaleRatio: item.femaleRatio,
+          monthlyVolumes: []
+        }
+      }
+      acc[item.keyword].totalVolume += item.searchVolume
+      acc[item.keyword].monthlyVolumes.push({
+        month: item.month,
+        volume: item.searchVolume
+      })
+      return acc
+    }, {})
+
+    // 성별 분석
+    const genderInsights = keywords.map(kw => {
+      const data = monthlyData[kw]
+      if (!data) return ''
+      const dominant = data.maleRatio > data.femaleRatio ? '남성' : '여성'
+      const ratio = Math.abs(data.maleRatio - data.femaleRatio).toFixed(1)
+      return `${kw}는 ${dominant}이 ${ratio}%p 더 많이 검색`
+    }).filter(Boolean).join(', ')
+
+    // 검색량 변화 분석
+    const trendAnalysis = keywords.map(kw => {
+      const volumes = monthlyData[kw]?.monthlyVolumes || []
+      if (volumes.length < 2) return ''
+      const sorted = volumes.sort((a: any, b: any) => a.month - b.month)
+      const latest = sorted[sorted.length - 1]
+      const prev = sorted[sorted.length - 2]
+      const change = ((latest.volume - prev.volume) / prev.volume * 100).toFixed(1)
+      return change
+    }).filter(Boolean)
+
+    const dataContext = keywords.map(kw => {
+      const data = monthlyData[kw]
+      return `${kw}: 총 ${data?.totalVolume?.toLocaleString()}회 검색`
+    }).join(', ')
 
     const prompt = `
-당신은 마케팅 데이터 분석 전문가입니다. 다음 검색 데이터를 분석하여 인사이트를 제공해주세요.
+당신은 마케팅 데이터 분석 전문가입니다. 다음 검색 데이터를 분석하여 실용적인 인사이트를 제공해주세요.
 
 **분석 대상:**
 - 키워드: ${keywords.join(', ')}
-- 기간: ${month}월
-- 데이터: ${dataContext}
+- 분석 기간: ${month}월
+- 검색 데이터: ${dataContext}
+- 성별 특성: ${genderInsights}
 
-**요구사항:**
-1. 검색량 트렌드 분석
-2. 타겟 고객층 특성
-3. 마케팅 전략 제안
-4. 간단명료하게 2-3문장으로 작성
-5. 한국어로 작성
+**분석 요구사항:**
+1. ${month}월에 검색량이 급증/감소한 이유 분석 (특별한 날짜나 이벤트가 있었는지)
+2. 어떤 성별이 주로 검색했는지와 그 이유
+3. 연령대별 특성 (제공된 데이터 기반)
+4. 이 인사이트를 활용한 구체적인 마케팅 제안
 
-**형식:**
-[키워드]에 대한 ${month}월 검색 트렌드를 분석한 결과, [주요 인사이트]. [추가 분석]. [마케팅 제안].
+**작성 형식:**
+- 2-3문장으로 간결하게 작성
+- 반드시 날짜/성별 특성을 언급
+- 실행 가능한 마케팅 제안 포함
+- 한국어로 작성
+
+**예시:**
+"${month}월 ${keywords[0]} 검색량은 [특정 날짜/이벤트]로 인해 [증가/감소]했으며, 특히 [성별]의 검색이 [비율]를 차지했습니다. [연령대] 타겟의 관심이 높아 [구체적 마케팅 제안]을 추천합니다."
 `
 
     const completion = await openai.chat.completions.create({

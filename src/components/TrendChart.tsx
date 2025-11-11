@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip } from 'recharts'
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from 'recharts'
 import type { KeywordData } from '../types'
+import ChartTooltip from './ChartTooltip'
 import './TrendChart.css'
 import { KEYWORD_COLORS } from './KeywordList'
 
@@ -13,26 +14,116 @@ interface TrendChartProps {
 }
 
 function TrendChart({ selectedKeywords, selectedYear, selectedPeriod, setSelectedPeriod, keywordData }: TrendChartProps) {
-  const periods = ['1일', '7일', '1주일', '한달', '3달', '6달', '1년', '2년']
+  const periods = ['3개월', '6개월', '1년', '2년']
   
-  // 실제 데이터 기반 차트 데이터 생성
+  // 기간에 따른 차트 데이터 생성
   const chartData = useMemo(() => {
-    // 선택된 년도의 모든 월 데이터
-    const months = Array.from({ length: 12 }, (_, i) => i + 1)
+    let dataPoints: any[] = []
+    const currentDate = new Date()
     
-    return months.map(month => {
-      const point: any = { label: `${month}월` }
-      
-      selectedKeywords.forEach(keyword => {
-        const monthData = keywordData.find(
-          item => item.keyword === keyword && item.year === selectedYear && item.month === month
-        )
-        point[keyword] = monthData?.searchVolume || 0
-      })
-      
-      return point
-    })
-  }, [selectedKeywords, keywordData, selectedYear])
+    switch(selectedPeriod) {
+      case '3개월': {
+        // 최근 3개월 데이터
+        for (let i = 2; i >= 0; i--) {
+          const date = new Date(currentDate.getFullYear(), currentDate.getMonth() - i, 1)
+          const year = date.getFullYear()
+          const month = date.getMonth() + 1
+          
+          const point: any = { label: `${year}.${month}` }
+          selectedKeywords.forEach(keyword => {
+            const monthData = keywordData.find(
+              item => item.keyword === keyword && item.year === year && item.month === month
+            )
+            point[keyword] = monthData?.searchVolume || 0
+          })
+          dataPoints.push(point)
+        }
+        break
+      }
+      case '6개월': {
+        // 최근 6개월 데이터
+        for (let i = 5; i >= 0; i--) {
+          const date = new Date(currentDate.getFullYear(), currentDate.getMonth() - i, 1)
+          const year = date.getFullYear()
+          const month = date.getMonth() + 1
+          
+          const point: any = { label: `${year}.${month}` }
+          selectedKeywords.forEach(keyword => {
+            const monthData = keywordData.find(
+              item => item.keyword === keyword && item.year === year && item.month === month
+            )
+            point[keyword] = monthData?.searchVolume || 0
+          })
+          dataPoints.push(point)
+        }
+        break
+      }
+      case '1년': {
+        // 최근 12개월 데이터
+        for (let i = 11; i >= 0; i--) {
+          const date = new Date(currentDate.getFullYear(), currentDate.getMonth() - i, 1)
+          const year = date.getFullYear()
+          const month = date.getMonth() + 1
+          
+          const point: any = { label: `${year}.${month}` }
+          selectedKeywords.forEach(keyword => {
+            const monthData = keywordData.find(
+              item => item.keyword === keyword && item.year === year && item.month === month
+            )
+            point[keyword] = monthData?.searchVolume || 0
+          })
+          dataPoints.push(point)
+        }
+        break
+      }
+      case '2년': {
+        // 최근 24개월 데이터 (분기별로 표시)
+        for (let i = 7; i >= 0; i--) {
+          const date = new Date(currentDate.getFullYear(), currentDate.getMonth() - (i * 3), 1)
+          const year = date.getFullYear()
+          const quarter = Math.floor(date.getMonth() / 3) + 1
+          
+          const point: any = { label: `${year}Q${quarter}` }
+          
+          // 해당 분기의 3개월 데이터 합산
+          selectedKeywords.forEach(keyword => {
+            let total = 0
+            for (let m = 0; m < 3; m++) {
+              const qDate = new Date(year, (quarter - 1) * 3 + m, 1)
+              const qYear = qDate.getFullYear()
+              const qMonth = qDate.getMonth() + 1
+              
+              const monthData = keywordData.find(
+                item => item.keyword === keyword && item.year === qYear && item.month === qMonth
+              )
+              total += monthData?.searchVolume || 0
+            }
+            point[keyword] = total
+          })
+          dataPoints.push(point)
+        }
+        break
+      }
+      default:
+        // 기본값: 6개월
+        for (let i = 5; i >= 0; i--) {
+          const date = new Date(currentDate.getFullYear(), currentDate.getMonth() - i, 1)
+          const year = date.getFullYear()
+          const month = date.getMonth() + 1
+          
+          const point: any = { label: `${year}.${month}` }
+          selectedKeywords.forEach(keyword => {
+            const monthData = keywordData.find(
+              item => item.keyword === keyword && item.year === year && item.month === month
+            )
+            point[keyword] = monthData?.searchVolume || 0
+          })
+          dataPoints.push(point)
+        }
+    }
+    
+    return dataPoints
+  }, [selectedKeywords, keywordData, selectedPeriod])
 
   // 남녀 비율 계산
   const genderRatio = useMemo(() => {
@@ -69,19 +160,46 @@ function TrendChart({ selectedKeywords, selectedYear, selectedPeriod, setSelecte
     return KEYWORD_COLORS[index % KEYWORD_COLORS.length]
   }
 
+  // 차트 툴팁용 연령대 데이터
+  const ageDataMap = useMemo(() => {
+    const map: { [keyword: string]: any } = {}
+    selectedKeywords.forEach(keyword => {
+      const data = keywordData.find(item => item.keyword === keyword)
+      if (data) {
+        map[keyword] = data.ageDistribution
+      }
+    })
+    return map
+  }, [selectedKeywords, keywordData])
+
   return (
     <div className="chart-section">
       <div className="chart-header">
         <div className="chart-title-wrapper">
           {selectedKeywords.length > 0 ? (
-            selectedKeywords.map((keyword, index) => (
-              <span key={keyword}>
-                <span className="chart-keyword" style={{ color: getKeywordColor(keyword) }}>
-                  '{keyword}'
+            <>
+              {selectedKeywords.slice(0, 3).map((keyword, index) => (
+                <span key={keyword}>
+                  <span className="chart-keyword" style={{ color: getKeywordColor(keyword) }}>
+                    '{keyword}'
+                  </span>
+                  {index < Math.min(selectedKeywords.length - 1, 2) && <span className="chart-separator">, </span>}
                 </span>
-                {index < selectedKeywords.length - 1 && <span className="chart-separator">, </span>}
-              </span>
-            ))
+              ))}
+              {selectedKeywords.length > 3 && (
+                <span className="keyword-overflow">
+                  <span className="chart-separator">, </span>
+                  <span className="chart-keyword more">...</span>
+                  <div className="keyword-overflow-box">
+                    {selectedKeywords.slice(3).map((keyword) => (
+                      <div key={keyword} className="overflow-item" style={{ color: getKeywordColor(keyword) }}>
+                        {keyword}
+                      </div>
+                    ))}
+                  </div>
+                </span>
+              )}
+            </>
           ) : (
             <span className="chart-keyword">키워드를 선택하세요</span>
           )}
@@ -143,16 +261,7 @@ function TrendChart({ selectedKeywords, selectedYear, selectedPeriod, setSelecte
               dx={-5}
               domain={[0, maxValue]}
             />
-            <Tooltip 
-              contentStyle={{
-                background: 'white',
-                border: '1px solid #e5e5e5',
-                borderRadius: '10px',
-                padding: '10px 14px',
-                boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
-              }}
-              formatter={(value: number) => value.toLocaleString()}
-            />
+            <ChartTooltip ageData={ageDataMap} />
             {selectedKeywords.map((keyword) => (
               <Area
                 key={keyword}

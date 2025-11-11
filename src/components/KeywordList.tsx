@@ -12,14 +12,22 @@ interface KeywordListProps {
 }
 
 const KEYWORD_COLORS = [
-  '#8b7aff',
-  '#ff6b9d',
-  '#4ecdc4',
-  '#ffa502',
-  '#ff6348',
-  '#a29bfe',
-  '#fd79a8',
-  '#00b894',
+  '#8b7aff', // 보라
+  '#ff6b9d', // 핑크
+  '#4ecdc4', // 청록
+  '#ffa502', // 주황
+  '#ff6348', // 빨강
+  '#a29bfe', // 연보라
+  '#fd79a8', // 연핑크
+  '#00b894', // 녹청
+  '#6c5ce7', // 인디고
+  '#e17055', // 테라코타
+  '#fdcb6e', // 노랑
+  '#00cec9', // 시안
+  '#0984e3', // 블루
+  '#d63031', // 다크레드
+  '#e84393', // 마젠타
+  '#74b9ff', // 라이트블루
 ]
 
 function KeywordList({ 

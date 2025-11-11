@@ -43,21 +43,24 @@
 }
 
 .keyword-list-container::-webkit-scrollbar {
-  width: 6px;
+  width: 8px;
 }
 
 .keyword-list-container::-webkit-scrollbar-track {
-  background: #f5f5f5;
-  border-radius: 10px;
+  background: transparent;
 }
 
 .keyword-list-container::-webkit-scrollbar-thumb {
-  background: #ccc;
+  background: #d0d0d0;
   border-radius: 10px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
 }
 
 .keyword-list-container::-webkit-scrollbar-thumb:hover {
-  background: #999;
+  background: #b0b0b0;
+  border: 2px solid transparent;
+  background-clip: padding-box;
 }
 
 .keyword-list {
@@ -79,7 +82,7 @@
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: background-color 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
   letter-spacing: -0.3px;
   width: 100%;
@@ -100,7 +103,6 @@
 }
 
 .keyword-btn:hover {
-  transform: translateY(-2px);
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.12);
 }
 
