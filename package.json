@@ -9,7 +9,7 @@
     "preview": "vite preview",
     "lint": "tsc --noEmit",
     "deploy": "npm run build && gh-pages -d dist",
-    "convert": "node scripts/convert-sheet-to-json.js"
+    "convert": "node scripts/import-from-csv.cjs"
   },
   "dependencies": {
     "axios": "^1.13.2",
