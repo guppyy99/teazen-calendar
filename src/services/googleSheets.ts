@@ -23,45 +23,35 @@ export async function fetchKeywordDataFromSheet(): Promise<KeywordData[]> {
   }
   
   try {
-    // 여러 시트 이름 시도
-    const possibleSheetNames = ['Sheet1', '시트1', 'Sheet', '데이터', 'Data']
-    let rows: any[] = []
-    let headers: string[] = []
-    let usedSheetName = ''
+    // 실제 시트 이름: sheet1 (소문자)
+    const sheetName = 'sheet1'
+    const range = `${sheetName}!A1:BZ1000`
+    const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${range}?key=${GOOGLE_SHEETS_API_KEY}`
     
-    for (const sheetName of possibleSheetNames) {
-      try {
-        const range = `${sheetName}!A1:BZ1000`
-        const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${range}?key=${GOOGLE_SHEETS_API_KEY}`
-        
-        console.log(`시도 중: ${sheetName}`)
-        
-        const response = await axios.get(url)
-        rows = response.data.values || []
-        
-        if (rows.length >= 2) {
-          headers = rows[0]
-          usedSheetName = sheetName
-          console.log(`✅ ${sheetName} 시트에서 데이터 발견!`)
-          console.log('응답 받음:', rows.length, '행')
-          console.log('헤더 개수:', headers.length)
-          console.log('첫 10개 헤더:', headers.slice(0, 10))
-          break
-        }
-      } catch (sheetError: any) {
-        console.log(`${sheetName} 시트 없음, 다음 시도...`)
-        continue
-      }
+    console.log(`📊 시트 접근: ${sheetName}`)
+    console.log('요청 URL:', url.replace(GOOGLE_SHEETS_API_KEY, 'API_KEY_HIDDEN'))
+
+    const response = await axios.get(url)
+    const rows = response.data.values || []
+    
+    console.log('✅ 응답 받음:', rows.length, '행')
+
+    if (rows.length < 2) {
+      throw new Error('시트에 데이터가 없습니다.')
     }
     
-    if (rows.length === 0) {
-      throw new Error('모든 시트 이름을 시도했지만 데이터를 찾을 수 없습니다.')
-    }
+    const headers = rows[0]
+    console.log('헤더 개수:', headers.length)
+    console.log('처음 15개 헤더:', headers.slice(0, 15))
 
     // headers는 위에서 이미 설정됨
     
-    // 월별 데이터 컬럼 찾기 (2021-11 형식)
-    const monthColumnStartIndex = headers.findIndex((h: string) => /^\d{4}-\d{1,2}$/.test(h))
+    // 월별 데이터 컬럼 찾기 (2021-11, 2022-9 형식)
+    const monthColumnStartIndex = headers.findIndex((h: string) => {
+      if (!h) return false
+      const trimmed = h.toString().trim()
+      return /^\d{4}-\d{1,2}$/.test(trimmed)
+    })
     
     if (monthColumnStartIndex === -1) {
       console.error('❌ 월별 컬럼을 찾을 수 없습니다!')
