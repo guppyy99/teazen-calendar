@@ -23,31 +23,54 @@ export async function fetchKeywordDataFromSheet(): Promise<KeywordData[]> {
   }
   
   try {
-    // 헤더와 데이터 모두 가져오기
-    const range = 'Sheet1!A1:BZ1000' // A부터 BZ까지 (충분히 넓게)
-    const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${range}?key=${GOOGLE_SHEETS_API_KEY}`
+    // 여러 시트 이름 시도
+    const possibleSheetNames = ['Sheet1', '시트1', 'Sheet', '데이터', 'Data']
+    let rows: any[] = []
+    let headers: string[] = []
+    let usedSheetName = ''
     
-    console.log('요청 URL:', url.replace(GOOGLE_SHEETS_API_KEY, 'API_KEY_HIDDEN'))
-
-    const response = await axios.get(url)
-    const rows = response.data.values || []
+    for (const sheetName of possibleSheetNames) {
+      try {
+        const range = `${sheetName}!A1:BZ1000`
+        const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${range}?key=${GOOGLE_SHEETS_API_KEY}`
+        
+        console.log(`시도 중: ${sheetName}`)
+        
+        const response = await axios.get(url)
+        rows = response.data.values || []
+        
+        if (rows.length >= 2) {
+          headers = rows[0]
+          usedSheetName = sheetName
+          console.log(`✅ ${sheetName} 시트에서 데이터 발견!`)
+          console.log('응답 받음:', rows.length, '행')
+          console.log('헤더 개수:', headers.length)
+          console.log('첫 10개 헤더:', headers.slice(0, 10))
+          break
+        }
+      } catch (sheetError: any) {
+        console.log(`${sheetName} 시트 없음, 다음 시도...`)
+        continue
+      }
+    }
     
-    console.log('응답 받음:', rows.length, '행')
-
-    if (rows.length < 2) {
-      throw new Error('시트에 데이터가 없습니다. 시트를 확인하세요.')
+    if (rows.length === 0) {
+      throw new Error('모든 시트 이름을 시도했지만 데이터를 찾을 수 없습니다.')
     }
 
-    // 첫 번째 행은 헤더
-    const headers = rows[0]
+    // headers는 위에서 이미 설정됨
     
     // 월별 데이터 컬럼 찾기 (2021-11 형식)
     const monthColumnStartIndex = headers.findIndex((h: string) => /^\d{4}-\d{1,2}$/.test(h))
     
     if (monthColumnStartIndex === -1) {
-      console.error('헤더:', headers)
-      throw new Error('월별 데이터 컬럼을 찾을 수 없습니다. 헤더 형식을 확인하세요 (예: 2021-11)')
+      console.error('❌ 월별 컬럼을 찾을 수 없습니다!')
+      console.error('전체 헤더:', headers)
+      console.error('YYYY-M 또는 YYYY-MM 형식의 헤더가 필요합니다 (예: 2021-11, 2022-1)')
+      throw new Error(`월별 데이터 컬럼을 찾을 수 없습니다.\n\n시트 헤더: ${headers.slice(0, 20).join(', ')}...\n\n2021-11 같은 형식이 필요합니다.`)
     }
+    
+    console.log(`✅ 월별 데이터 시작 컬럼: ${monthColumnStartIndex} (${headers[monthColumnStartIndex]})`)
 
     const result: KeywordData[] = []
 
