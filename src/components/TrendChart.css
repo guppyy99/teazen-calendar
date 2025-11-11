@@ -1,0 +1,123 @@
+.chart-section {
+  flex: 1;
+  background: white;
+  border-radius: 20px;
+  padding: 40px 45px;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.05);
+}
+
+.chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.chart-title-wrapper {
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+  flex-wrap: wrap;
+}
+
+.chart-keyword {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+}
+
+.chart-separator {
+  color: #555;
+  font-size: 18px;
+}
+
+.chart-subtitle {
+  font-size: 16px;
+  color: #555;
+  font-weight: 500;
+  letter-spacing: -0.2px;
+  margin-left: 8px;
+}
+
+.chart-legend {
+  display: flex;
+  gap: 28px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.legend-color {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+}
+
+.legend-color.male {
+  background: #70b8ff;
+}
+
+.legend-color.female {
+  background: #ff8ac6;
+}
+
+.legend-label {
+  font-size: 13px;
+  color: #777;
+  letter-spacing: -0.2px;
+}
+
+.legend-value {
+  font-size: 14px;
+  font-weight: 600;
+  color: #2d2d2d;
+}
+
+.period-selector {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
+}
+
+.period-btn {
+  padding: 10px 20px;
+  border: 1px solid #e0e0e0;
+  border-radius: 20px;
+  background: white;
+  color: #888;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.period-btn:hover {
+  background: #f7f7f7;
+  border-color: #ccc;
+}
+
+.period-btn.active {
+  background: #8b7aff;
+  color: white;
+  border-color: #8b7aff;
+  box-shadow: 0 2px 8px rgba(139, 122, 255, 0.3);
+}
+
+.chart-container {
+  width: 100%;
+  height: 420px;
+}
+
+@media (max-width: 768px) {
+  .chart-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+

@@ -1,0 +1,20 @@
+.footer {
+  background: #2d2d2d;
+  padding: 30px 50px;
+  margin-top: 80px;
+  border-top: 1px solid #e0e0e0;
+}
+
+.footer-content {
+  max-width: 1440px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.footer-text {
+  color: #aaa;
+  font-size: 14px;
+  margin: 0;
+  letter-spacing: 0.3px;
+}
+

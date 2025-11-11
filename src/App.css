@@ -1,0 +1,66 @@
+.app {
+  width: 100%;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #fafafa 0%, #ffffff 100%);
+}
+
+.container {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 30px 50px;
+}
+
+.content-wrapper {
+  display: flex;
+  gap: 50px;
+  margin-top: 50px;
+  align-items: flex-start;
+}
+
+.error-message {
+  background: white;
+  border-radius: 20px;
+  padding: 40px;
+  text-align: center;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.05);
+}
+
+.error-message h3 {
+  color: #ff6348;
+  margin-bottom: 16px;
+  font-size: 20px;
+}
+
+.error-message p {
+  color: #666;
+  margin-bottom: 24px;
+}
+
+.error-message button {
+  padding: 12px 32px;
+  background: #8b7aff;
+  color: white;
+  border: none;
+  border-radius: 25px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.error-message button:hover {
+  background: #7a68ee;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(139, 122, 255, 0.3);
+}
+
+@media (max-width: 768px) {
+  .content-wrapper {
+    flex-direction: column;
+  }
+  
+  .container {
+    padding: 20px;
+  }
+}
+

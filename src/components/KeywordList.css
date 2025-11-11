@@ -1,0 +1,145 @@
+.keyword-section {
+  min-width: 280px;
+  max-width: 320px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.keyword-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #2d2d2d;
+  margin-bottom: 20px;
+  letter-spacing: -0.3px;
+  text-align: center;
+}
+
+.keyword-search {
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.keyword-search-input {
+  width: 100%;
+  padding: 12px 18px;
+  border: 2px solid #e0e0e0;
+  border-radius: 25px;
+  font-size: 14px;
+  outline: none;
+  transition: all 0.3s;
+}
+
+.keyword-search-input:focus {
+  border-color: #8b7aff;
+  box-shadow: 0 0 0 3px rgba(139, 122, 255, 0.1);
+}
+
+.keyword-list-container {
+  width: 100%;
+  max-height: 600px;
+  overflow-y: auto;
+  padding-right: 8px;
+}
+
+.keyword-list-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.keyword-list-container::-webkit-scrollbar-track {
+  background: #f5f5f5;
+  border-radius: 10px;
+}
+
+.keyword-list-container::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 10px;
+}
+
+.keyword-list-container::-webkit-scrollbar-thumb:hover {
+  background: #999;
+}
+
+.keyword-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.keyword-item-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.keyword-btn {
+  padding: 16px 20px;
+  border: none;
+  border-radius: 50px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+  letter-spacing: -0.3px;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.keyword-name {
+  flex: 1;
+  text-align: left;
+}
+
+.keyword-volume {
+  font-size: 12px;
+  opacity: 0.8;
+  font-weight: 600;
+}
+
+.keyword-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.12);
+}
+
+.keyword-btn.active {
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
+  font-weight: 600;
+}
+
+.keyword-loading {
+  text-align: center;
+  padding: 40px 20px;
+  color: #999;
+  font-size: 14px;
+}
+
+.keyword-empty {
+  text-align: center;
+  padding: 40px 20px;
+  color: #999;
+  font-size: 14px;
+}
+
+.keyword-stats {
+  width: 100%;
+  text-align: center;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #e0e0e0;
+  font-size: 13px;
+  color: #888;
+}
+
+@media (max-width: 768px) {
+  .keyword-section {
+    max-width: 100%;
+  }
+  
+  .keyword-list-container {
+    max-height: 400px;
+  }
+}
+
